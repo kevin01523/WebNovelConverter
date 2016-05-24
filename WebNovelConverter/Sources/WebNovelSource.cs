@@ -61,6 +61,10 @@ namespace WebNovelConverter.Sources
                 if (string.IsNullOrWhiteSpace(e.TextContent) || !e.HasAttribute("href"))
                     continue;
 
+                // Skip social media share links
+                if (e.HasAttribute("Class") && e.GetAttribute("Class").Contains("share-icon") && e.GetAttribute("rel") == "nofollow")
+                    continue;
+
                 string url = UrlHelper.ToAbsoluteUrl(baseUrl, e.GetAttribute("href"));
 
                 if (string.IsNullOrEmpty(url))
