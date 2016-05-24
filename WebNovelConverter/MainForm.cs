@@ -196,7 +196,7 @@ namespace WebNovelConverter
                     }
                     catch (Exception ex)
                     {
-                        WriteText($"Failed to process {link.Name}!", Color.Red);
+                        WriteText($"Failed to process {link.Name} when processing URL {link.Url}!", Color.Red);
                         WriteText($"ERROR: {ex}", Color.Red);
                     }
 
