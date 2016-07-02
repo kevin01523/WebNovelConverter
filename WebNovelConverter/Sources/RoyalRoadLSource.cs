@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
@@ -16,7 +15,8 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "http://royalroadl.com/";
 
-        private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled);
+        private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex RemoveFontStyleRegex = new Regex("(font|font-[a-z]+)\\s*:([^;]*)[;]?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public RoyalRoadLSource() : base("RoyalRoadL")
         {
@@ -78,10 +78,13 @@ namespace WebNovelConverter.Sources
             if (postBodyEl == null)
                 return null;
 
+            RemoveEmptyNodes(postBodyEl);
+            RemoveAnnouncements(postBodyEl);
             RemoveNavigation(postBodyEl);
             RemoveDonation(postBodyEl);
             ExpandSpoilers(postBodyEl);
             RemoveEmptyTags(postBodyEl);
+            RemoveFontStyle(postBodyEl);
 
             var content = CleanupHTML(postBodyEl.InnerHtml);
 
@@ -107,6 +110,23 @@ namespace WebNovelConverter.Sources
                 CoverUrl = coverUrl,
                 Title = title
             };
+        }
+
+        protected virtual void RemoveEmptyNodes(IElement rootElement)
+        {
+            foreach (var node in rootElement.ChildNodes.ToList())
+            {
+                if (!node.HasChildNodes && string.IsNullOrWhiteSpace(node.TextContent))
+                {
+                    rootElement.RemoveChild(node);
+                }
+            }
+        }
+
+        protected virtual void RemoveAnnouncements(IElement rootElement)
+        {
+            if (rootElement.FirstChild != null && rootElement.FirstChild.NodeName.ToLower() == "div")
+                rootElement.RemoveChild(rootElement.FirstChild);
         }
 
         protected virtual void RemoveNavigation(IElement rootElement)
@@ -157,9 +177,26 @@ namespace WebNovelConverter.Sources
         {
             foreach (IElement el in rootElement.QuerySelectorAll("div,span"))
             {
+                RemoveEmptyTags(el);
+
                 if (string.IsNullOrWhiteSpace(el.TextContent) && el.ChildElementCount == 0)
                 {
                     el.Remove();
+                }
+            }
+        }
+
+        private void RemoveFontStyle(IElement rootElement)
+        {
+            foreach (var element in rootElement.Children.ToList())
+            {
+                RemoveFontStyle(element);
+
+                if (element.HasAttribute("style"))
+                {
+                    var style = element.GetAttribute("style");
+                    style = RemoveFontStyleRegex.Replace(style, string.Empty);
+                    element.SetAttribute("style", style);
                 }
             }
         }
