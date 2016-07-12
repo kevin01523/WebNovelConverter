@@ -40,6 +40,7 @@ namespace WebNovelConverter
             _sources.Add(new BlogspotSource());
             _sources.Add(new NovelsNaoSource());
             _sources.Add(new LNMTLSource());
+            _sources.Add(new FanFictionSource());
 
             websiteTypeComboBox.SelectedIndex = 0;
             modeComboBox.SelectedIndex = 0;
@@ -424,6 +425,7 @@ namespace WebNovelConverter
                     modeComboBox.Items.AddRange(new object[] { "Table of Contents", "Next Chapter Link" });
                     break;
                 case "royalroadl":
+                case "fanfiction":
                 case "baka-tsuki":
                     modeComboBox.Items.Add("Table of Contents");
                     break;

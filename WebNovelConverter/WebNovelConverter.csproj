@@ -92,6 +92,7 @@
     <Compile Include="Sources\NovelSourceCollection.cs" />
     <Compile Include="Sources\RoyalRoadLSource.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
+    <Compile Include="Sources\FanFictionSource.cs" />
     <Compile Include="Sources\WordPressSource.cs" />
     <Compile Include="UrlHelper.cs" />
     <Compile Include="Sources\Models\WebNovelChapter.cs" />
