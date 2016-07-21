@@ -17,6 +17,8 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "https://www.baka-tsuki.org";
 
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents };
+
         public static readonly string[] PossibleChapterNameParts =
         {
             "illustrations",

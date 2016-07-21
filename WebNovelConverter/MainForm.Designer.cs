@@ -343,13 +343,6 @@
             // 
             this.websiteTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.websiteTypeComboBox.FormattingEnabled = true;
-            this.websiteTypeComboBox.Items.AddRange(new object[] {
-            "WordPress",
-            "RoyalRoadL",
-            "Baka-Tsuki",
-            "Blogspot",
-            "LNMTL",
-            "Fanfiction"});
             this.websiteTypeComboBox.Location = new System.Drawing.Point(62, 7);
             this.websiteTypeComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.websiteTypeComboBox.Name = "websiteTypeComboBox";

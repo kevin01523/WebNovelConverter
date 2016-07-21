@@ -14,11 +14,13 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "https://fanfiction.net/";
 
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents };
+
         public FanFictionSource() : base("Fanfiction")
         {
         }
 
-        public FanFictionSource(string type) : base(type)
+        protected FanFictionSource(string type) : base(type)
         {
         }
 

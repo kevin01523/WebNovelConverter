@@ -14,6 +14,8 @@ namespace WebNovelConverter.Sources
 {
     public class BlogspotSource : WebNovelSource
     {
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents, Mode.NextChapterLink };
+
         protected readonly List<string> PostClasses = new List<string>
         {
             "pagepost",
@@ -42,10 +44,6 @@ namespace WebNovelConverter.Sources
         };
 
         public BlogspotSource() : base("Blogspot")
-        {
-        }
-
-        protected BlogspotSource(string sourceName) : base(sourceName)
         {
         }
 

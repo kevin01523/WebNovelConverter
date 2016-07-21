@@ -26,6 +26,15 @@ namespace WebNovelConverter
 
         public MainForm()
         {
+            _sources.Add(new WordPressSource());
+            _sources.Add(new RoyalRoadLSource());
+            _sources.Add(new BakaTsukiSource());
+            _sources.Add(new BlogspotSource());
+            _sources.Add(new NovelsNaoSource());
+            _sources.Add(new LNMTLSource());
+            _sources.Add(new FanFictionSource());
+            _sources.Add(new FictionPressSource());
+
             InitializeComponent();
         }
 
@@ -34,14 +43,10 @@ namespace WebNovelConverter
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             this.Text += $" {ver.Major}.{ver.Minor}.{ver.Build}";
 
-            _sources.Add(new WordPressSource());
-            _sources.Add(new RoyalRoadLSource());
-            _sources.Add(new BakaTsukiSource());
-            _sources.Add(new BlogspotSource());
-            _sources.Add(new NovelsNaoSource());
-            _sources.Add(new LNMTLSource());
-            _sources.Add(new FanFictionSource());
-
+            foreach (var source in _sources)
+            {
+                this.websiteTypeComboBox.Items.Add(source);
+            }
             websiteTypeComboBox.SelectedIndex = 0;
             modeComboBox.SelectedIndex = 0;
         }
@@ -155,11 +160,11 @@ namespace WebNovelConverter
         private async void convertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             var items = new List<object>();
-            string type = string.Empty;
+            WebNovelSource selectedWebsite = null;
             string mode = string.Empty;
             Invoke((MethodInvoker)delegate
             {
-                type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
+                selectedWebsite = (WebNovelSource) websiteTypeComboBox.SelectedItem;
                 mode = ((string)modeComboBox.SelectedItem).ToLower();
                 items.AddRange(chaptersListBox.Items.Cast<object>());
             });
@@ -178,7 +183,7 @@ namespace WebNovelConverter
 
                     try
                     {
-                        WebNovelSource source = GetSource(link.Url, type);
+                        WebNovelSource source = GetSource(link.Url, selectedWebsite);
                         WebNovelChapter chapter = await source.GetChapterAsync(link);
 
                         if (chapter == null)
@@ -232,14 +237,14 @@ namespace WebNovelConverter
 
         private async void retrieveBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string type = string.Empty;
+            WebNovelSource selectedWebsite = null;
             string mode = string.Empty;
             string modeSelectedText = string.Empty;
             int amount = 0;
 
             Invoke((MethodInvoker)delegate
             {
-                type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
+                selectedWebsite = (WebNovelSource)websiteTypeComboBox.SelectedItem;
                 mode = ((string)modeComboBox.SelectedItem).ToLower();
                 modeSelectedText = modeSelectedTextBox.Text;
                 amount = (int)amountNumericUpDown.Value;
@@ -248,7 +253,7 @@ namespace WebNovelConverter
             if (!(modeSelectedText.StartsWith("http://") || modeSelectedText.StartsWith("https://")))
                 modeSelectedText = "http://" + modeSelectedText;
 
-            WebNovelSource source = GetSource(modeSelectedText, type);
+            WebNovelSource source = GetSource(modeSelectedText, selectedWebsite);
 
             WebNovelInfo novelInfo = await source.GetNovelInfoAsync(modeSelectedText);
 
@@ -373,9 +378,9 @@ namespace WebNovelConverter
             }
         }
 
-        private WebNovelSource GetSource(string url, string fallbackType)
+        private WebNovelSource GetSource(string url, WebNovelSource fallback)
         {
-            return _sources.Get(url) ?? _sources.GetByName(fallbackType);
+            return _sources.Get(url) ?? fallback;
         }
 
         private void WriteText(string text)
@@ -416,26 +421,14 @@ namespace WebNovelConverter
         {
             modeComboBox.Items.Clear();
 
-            string type = (string)websiteTypeComboBox.SelectedItem;
+            WebNovelSource selectedWebsite = (WebNovelSource)websiteTypeComboBox.SelectedItem;
+            var availableModes = selectedWebsite.AvailableModes;
 
-            switch (type.ToLower())
-            {
-                case "wordpress":
-                case "blogspot":
-                    modeComboBox.Items.AddRange(new object[] { "Table of Contents", "Next Chapter Link" });
-                    break;
-                case "royalroadl":
-                case "fanfiction":
-                case "baka-tsuki":
-                    modeComboBox.Items.Add("Table of Contents");
-                    break;
-                case "lnmtl":
-                    modeComboBox.Items.Add("Next Chapter Link");
-                    break;
-                default:
-                    modeComboBox.Items.Add("Table of Contents");
-                    break;
-            }
+            if(availableModes.Contains(WebNovelSource.Mode.TableOfContents))
+                modeComboBox.Items.Add("Table of Contents");
+
+            if (availableModes.Contains(WebNovelSource.Mode.NextChapterLink))
+                modeComboBox.Items.Add("Next Chapter Link");
 
             modeComboBox.SelectedIndex = 0;
         }

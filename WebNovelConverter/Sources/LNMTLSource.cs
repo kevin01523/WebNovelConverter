@@ -16,6 +16,8 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "http://lnmtl.com";
 
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.NextChapterLink };
+
         private static readonly List<string> ChapterTitleClasses = new List<string>
         {
             "chapter-title"

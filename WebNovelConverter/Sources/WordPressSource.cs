@@ -14,6 +14,8 @@ namespace WebNovelConverter.Sources
 {
     public class WordPressSource : WebNovelSource
     {
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents, Mode.NextChapterLink };
+
         protected readonly List<string> BloatClasses = new List<string>
         {
             "sharedaddy",
@@ -79,7 +81,7 @@ namespace WebNovelConverter.Sources
         {
         }
 
-        public WordPressSource(string type) : base(type)
+        protected WordPressSource(string type) : base(type)
         {
         }
 

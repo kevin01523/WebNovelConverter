@@ -15,6 +15,8 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "http://royalroadl.com/";
 
+        public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents };
+
         private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex RemoveFontStyleRegex = new Regex("(font|font-[a-z]+)\\s*:([^;]*)[;]?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -107,8 +109,8 @@ namespace WebNovelConverter.Sources
 
             return new WebNovelInfo
             {
-                CoverUrl = coverUrl,
-                Title = title
+                CoverUrl = !string.IsNullOrWhiteSpace(coverUrl) ? coverUrl.Trim() : null,
+                Title = !string.IsNullOrWhiteSpace(title) ? title.Trim() : null
             };
         }
 

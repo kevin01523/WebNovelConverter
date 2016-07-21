@@ -15,6 +15,14 @@ namespace WebNovelConverter.Sources
 {
     public abstract class WebNovelSource
     {
+        public enum Mode
+        {
+            TableOfContents,
+            NextChapterLink
+        }
+
+        public abstract List<Mode> AvailableModes { get; }
+
         protected static readonly ChapterLink[] EmptyLinks = new ChapterLink[0];
 
         public virtual string BaseUrl { get; protected set; }
@@ -93,6 +101,11 @@ namespace WebNovelConverter.Sources
 
                 return Encoding.UTF8.GetString(content, 0, content.Length);
             }
+        }
+
+        public override string ToString()
+        {
+            return SourceName;
         }
     }
 }
