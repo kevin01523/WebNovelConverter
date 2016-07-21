@@ -2,10 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WebNovelConverter.Sources
+namespace WebNovelConverter.Sources.Models
 {
     public class NovelSourceCollection : ICollection<WebNovelSource>
     {

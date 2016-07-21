@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
-using WebNovelConverter.Sources.Models;
-using AngleSharp.Extensions;
 using WebNovelConverter.Extensions;
+using WebNovelConverter.Sources.Models;
 
-namespace WebNovelConverter.Sources
+namespace WebNovelConverter.Sources.Websites
 {
     public class LNMTLSource : WebNovelSource
     {

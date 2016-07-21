@@ -68,9 +68,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\ElementExtensions.cs" />
-    <Compile Include="Sources\BlogspotSource.cs" />
-    <Compile Include="Sources\FictionPressSource.cs" />
-    <Compile Include="Sources\LNMTLSource.cs" />
+    <Compile Include="Sources\Websites\BlogspotSource.cs" />
+    <Compile Include="Sources\Websites\FictionPressSource.cs" />
+    <Compile Include="Sources\Websites\LNMTLSource.cs" />
     <Compile Include="Sources\Models\ChapterLink.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -86,14 +86,14 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Sources\BakaTsukiSource.cs" />
+    <Compile Include="Sources\Websites\BakaTsukiSource.cs" />
     <Compile Include="Sources\Models\ChapterRetrievalOptions.cs" />
     <Compile Include="Sources\Models\WebNovelInfo.cs" />
-    <Compile Include="Sources\NovelsNaoSource.cs" />
-    <Compile Include="Sources\NovelSourceCollection.cs" />
-    <Compile Include="Sources\RoyalRoadLSource.cs" />
+    <Compile Include="Sources\Websites\NovelsNaoSource.cs" />
+    <Compile Include="Sources\Models\NovelSourceCollection.cs" />
+    <Compile Include="Sources\Websites\RoyalRoadLSource.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
-    <Compile Include="Sources\FanFictionSource.cs" />
+    <Compile Include="Sources\Websites\FanFictionSource.cs" />
     <Compile Include="Sources\WordPressSource.cs" />
     <Compile Include="UrlHelper.cs" />
     <Compile Include="Sources\Models\WebNovelChapter.cs" />
@@ -132,6 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Rotate Right-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sources\Base\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

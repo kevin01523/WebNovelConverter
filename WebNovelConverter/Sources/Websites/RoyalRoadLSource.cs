@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Sources.Models;
-using System.Text.RegularExpressions;
 
-namespace WebNovelConverter.Sources
+namespace WebNovelConverter.Sources.Websites
 {
     public class RoyalRoadLSource : WebNovelSource
     {

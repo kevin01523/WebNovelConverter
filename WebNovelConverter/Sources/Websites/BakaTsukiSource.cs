@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Sources.Models;
-using System.Text.RegularExpressions;
 
-namespace WebNovelConverter.Sources
+namespace WebNovelConverter.Sources.Websites
 {
     public class BakaTsukiSource : WebNovelSource
     {
