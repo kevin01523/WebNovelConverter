@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace WebNovelConverter.Sources.Websites
                 chapterLinks.Add(new ChapterLink
                 {
                     Name = name,
-                    Url = Regex.Replace(baseUrl, "(fanfiction.net/s/[0-9]+)/([0-9]+)/", "$1/" + chapterNr + "/")
+                    Url = Regex.Replace(baseUrl.ToLower(),"(" + Regex.Escape(new Uri(BaseUrl).Host.ToLower()) + "/s/[0-9]+)/([0-9]+)/", "$1/" + chapterNr + "/")
                 });
             }
 
