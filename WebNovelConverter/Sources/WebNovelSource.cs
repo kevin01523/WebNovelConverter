@@ -80,7 +80,7 @@ namespace WebNovelConverter.Sources
 
                 ChapterLink link = new ChapterLink
                 {
-                    Name = WebUtility.HtmlDecode(e.TextContent),
+                    Name = WebUtility.HtmlDecode(e.TextContent).Trim(),
                     Url = url
                 };
 

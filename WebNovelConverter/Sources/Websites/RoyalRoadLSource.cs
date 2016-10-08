@@ -18,7 +18,7 @@ namespace WebNovelConverter.Sources.Websites
         public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents };
 
         private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex RemoveFontStyleRegex = new Regex("(font|font-[a-z]+)\\s*:([^;]*)[;]?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex RemoveFontStyleRegex = new Regex("(font|font-(family|size))\\s*:([^;]*)[;]?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public RoyalRoadLSource() : base("RoyalRoadL")
         {
@@ -30,36 +30,7 @@ namespace WebNovelConverter.Sources.Websites
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var chapterElements = from element in doc.All
-                                  where element.LocalName == "li"
-                                  where element.HasAttribute("class")
-                                  let classAttrib = element.GetAttribute("class")
-                                  where classAttrib.Contains("chapter")
-                                  select element;
-
-            return CollectChapterLinks(baseUrl, chapterElements);
-        }
-
-        protected override IEnumerable<ChapterLink> CollectChapterLinks(string baseUrl, IEnumerable<IElement> linkElements, Func<IElement, bool> linkFilter = null)
-        {
-            foreach (IElement chapterElement in linkElements)
-            {
-                IElement linkElement = chapterElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "a");
-
-                if (linkElement == null || !linkElement.HasAttribute("title") || !linkElement.HasAttribute("href"))
-                    continue;
-
-                string title = linkElement.GetAttribute("title");
-
-                ChapterLink link = new ChapterLink
-                {
-                    Name = title,
-                    Url = linkElement.GetAttribute("href"),
-                    Unknown = false
-                };
-
-                yield return link;
-            }
+            return CollectChapterLinks(baseUrl, doc.QuerySelectorAll("#chapters tbody tr[data-url] a"));
         }
 
         public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link,
@@ -70,12 +41,7 @@ namespace WebNovelConverter.Sources.Websites
 
             IHtmlDocument doc = await Parser.ParseAsync(pageContent, token);
 
-            IElement postBodyEl = (from e in doc.All
-                                   where e.LocalName == "div"
-                                   where e.HasAttribute("class")
-                                   let classAttribute = e.GetAttribute("class")
-                                   where classAttribute.Contains("post_body")
-                                   select e).FirstOrDefault();
+            IElement postBodyEl = doc.QuerySelector(".chapter-content");
 
             if (postBodyEl == null)
                 return null;
@@ -83,7 +49,7 @@ namespace WebNovelConverter.Sources.Websites
             RemoveEmptyNodes(postBodyEl);
             RemoveAnnouncements(postBodyEl);
             RemoveNavigation(postBodyEl);
-            RemoveDonation(postBodyEl);
+            RemoveAdvertisements(postBodyEl);
             ExpandSpoilers(postBodyEl);
             RemoveEmptyTags(postBodyEl);
             RemoveFontStyle(postBodyEl);
@@ -103,14 +69,15 @@ namespace WebNovelConverter.Sources.Websites
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var fictionHeaderDes = doc.GetElementById("fiction-header");
-            var coverUrl = fictionHeaderDes.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
-            var title = fictionHeaderDes.QuerySelector("h1.fiction-title")?.TextContent;
+            var coverUrl = doc.QuerySelector(".fiction-page .fic-header img")?.GetAttribute("src");
+            var title = doc.QuerySelector(".fiction-page .fic-title h2")?.TextContent?.Trim();
+            var description = doc.QuerySelector(".fiction-page .fiction-info .description")?.TextContent?.Trim();
 
             return new WebNovelInfo
             {
                 CoverUrl = !string.IsNullOrWhiteSpace(coverUrl) ? coverUrl.Trim() : null,
-                Title = !string.IsNullOrWhiteSpace(title) ? title.Trim() : null
+                Title = !string.IsNullOrWhiteSpace(title) ? title.Trim() : null,
+                Description = description
             };
         }
 
@@ -118,7 +85,7 @@ namespace WebNovelConverter.Sources.Websites
         {
             foreach (var node in rootElement.ChildNodes.ToList())
             {
-                if (!node.HasChildNodes && string.IsNullOrWhiteSpace(node.TextContent))
+                if (!node.HasChildNodes && string.IsNullOrWhiteSpace(node.TextContent) && node.NodeName.ToLower() != "br")
                 {
                     rootElement.RemoveChild(node);
                 }
@@ -144,12 +111,19 @@ namespace WebNovelConverter.Sources.Websites
             }
         }
 
-        protected virtual void RemoveDonation(IElement rootElement)
+        protected virtual void RemoveAdvertisements(IElement rootElement)
         {
+            // Donations
             foreach (var el in rootElement.QuerySelectorAll("div.thead"))
             {
                 if (el.TextContent.Contains("Donation for the Author"))
                     el.Remove();
+            }
+
+            // Advertisements
+            foreach (var el in rootElement.QuerySelectorAll("div.smalltext"))
+            {
+                el.Remove();
             }
         }
 
