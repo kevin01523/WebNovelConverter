@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom.Html;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources.Websites
 {
@@ -53,7 +54,7 @@ namespace WebNovelConverter.Sources.Websites
 
             return new WebNovelChapter()
             {
-                Content = doc.QuerySelector("#storytext").InnerHtml
+                Content = new ContentCleanup().Execute(doc, doc.QuerySelector("#storytext"))
             };
         }
 

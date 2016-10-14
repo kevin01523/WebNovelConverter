@@ -9,6 +9,7 @@ using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources.Websites
 {
@@ -178,7 +179,7 @@ namespace WebNovelConverter.Sources.Websites
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = contentElement.InnerHtml
+                Content = new ContentCleanup().Execute(doc, contentElement)
             };
         }
 

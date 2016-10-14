@@ -6,6 +6,7 @@ using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources.Websites
 {
@@ -44,15 +45,16 @@ namespace WebNovelConverter.Sources.Websites
             IElement titleElement = doc.DocumentElement.FirstWhereHasClass(ChapterTitleClasses);
             IElement chapterElement = doc.DocumentElement.FirstWhereHasClass(ChapterClasses);
 
+            var contentEl = doc.CreateElement("P");
             var chContentElements = chapterElement.WhereHasClass(ChapterContentClasses, element => element.LocalName == "sentence");
+            contentEl.Append(chContentElements.Cast<INode>().ToArray());
 
-            string contents = string.Join("<br/><br/>", chContentElements.Select(p => p.InnerHtml));
             string nextChapter = doc.QuerySelector("ul.pager > li.next > a")?.GetAttribute("href");
 
             return new WebNovelChapter
             {
                 ChapterName = titleElement?.TextContent,
-                Content = contents,
+                Content = new ContentCleanup().Execute(doc, contentEl),
                 NextChapterUrl = nextChapter
             };
         }

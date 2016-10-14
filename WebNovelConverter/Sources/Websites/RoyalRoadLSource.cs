@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -8,6 +7,7 @@ using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources.Websites
 {
@@ -17,7 +17,6 @@ namespace WebNovelConverter.Sources.Websites
 
         public override List<Mode> AvailableModes => new List<Mode> { Mode.TableOfContents };
 
-        private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex RemoveFontStyleRegex = new Regex("(font|font-(family|size))\\s*:([^;]*)[;]?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public RoyalRoadLSource() : base("RoyalRoadL")
@@ -51,10 +50,9 @@ namespace WebNovelConverter.Sources.Websites
             RemoveNavigation(postBodyEl);
             RemoveAdvertisements(postBodyEl);
             ExpandSpoilers(postBodyEl);
-            RemoveEmptyTags(postBodyEl);
             RemoveFontStyle(postBodyEl);
 
-            var content = CleanupHTML(postBodyEl.InnerHtml);
+            var content = new ContentCleanup().Execute(doc, postBodyEl);
 
             return new WebNovelChapter
             {
@@ -149,19 +147,6 @@ namespace WebNovelConverter.Sources.Websites
             }
         }
 
-        private void RemoveEmptyTags(IElement rootElement)
-        {
-            foreach (IElement el in rootElement.QuerySelectorAll("div,span"))
-            {
-                RemoveEmptyTags(el);
-
-                if (string.IsNullOrWhiteSpace(el.TextContent) && el.ChildElementCount == 0)
-                {
-                    el.Remove();
-                }
-            }
-        }
-
         private void RemoveFontStyle(IElement rootElement)
         {
             foreach (var element in rootElement.Children.ToList())
@@ -175,14 +160,6 @@ namespace WebNovelConverter.Sources.Websites
                     element.SetAttribute("style", style);
                 }
             }
-        }
-
-        private string CleanupHTML(string html)
-        {
-            // Too many newlines sometimes
-            html = HtmlCleanupRegex.Replace(html, "<br /><br />");
-
-            return html.Trim();
         }
     }
 }

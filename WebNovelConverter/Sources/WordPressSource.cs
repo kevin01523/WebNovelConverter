@@ -9,6 +9,7 @@ using AngleSharp.Extensions;
 using AngleSharp.Parser.Html;
 using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources
 {
@@ -110,7 +111,7 @@ namespace WebNovelConverter.Sources
 
             var paged = GetPagedChapterUrls(doc.DocumentElement);
 
-            WebNovelChapter chapter = ParseChapter(doc.DocumentElement, token);
+            WebNovelChapter chapter = ParseChapter(doc, doc.DocumentElement, token);
 
             if (chapter == null)
                 return null;
@@ -124,13 +125,13 @@ namespace WebNovelConverter.Sources
 
                 IHtmlDocument pageDoc = await Parser.ParseAsync(pageContent, token);
 
-                chapter.Content += ParseChapter(pageDoc.DocumentElement, token).Content;
+                chapter.Content += ParseChapter(pageDoc, pageDoc.DocumentElement, token).Content;
             }
 
             return chapter;
         }
 
-        protected virtual WebNovelChapter ParseChapter(IElement rootElement, CancellationToken token = default(CancellationToken))
+        private WebNovelChapter ParseChapter(IDocument doc, IElement rootElement, CancellationToken token = default(CancellationToken))
         {
             IElement articleElement = rootElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
             IElement element = rootElement.FirstWhereHasClass(PostClasses) ?? articleElement;
@@ -179,7 +180,7 @@ namespace WebNovelConverter.Sources
                 RemoveScriptStyleElements(element);
 
                 chapter.ChapterName = chapterNameElement?.Text()?.Trim();
-                chapter.Content = element.InnerHtml;
+                chapter.Content = new ContentCleanup().Execute(doc, element);
             }
             else
             {

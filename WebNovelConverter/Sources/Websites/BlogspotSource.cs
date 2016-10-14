@@ -8,6 +8,7 @@ using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources.Websites
 {
@@ -77,7 +78,7 @@ namespace WebNovelConverter.Sources.Websites
 
             IElement titleElement = doc.DocumentElement.FirstWhereHasClass(TitleClasses);
 
-            WebNovelChapter chapter = ParseChapter(doc.DocumentElement, token);
+            WebNovelChapter chapter = ParseChapter(doc, doc.DocumentElement, token);
             chapter.Url = link.Url;
 
             if (titleElement != null)
@@ -86,7 +87,7 @@ namespace WebNovelConverter.Sources.Websites
             return chapter;
         }
 
-        protected virtual WebNovelChapter ParseChapter(IElement rootElement, CancellationToken token = default(CancellationToken))
+        private WebNovelChapter ParseChapter(IDocument doc, IElement rootElement, CancellationToken token = default(CancellationToken))
         {
             WebNovelChapter chapter = new WebNovelChapter();
 
@@ -111,7 +112,7 @@ namespace WebNovelConverter.Sources.Websites
 
             if (element != null)
             {
-                chapter.Content = element.InnerHtml;
+                chapter.Content = new ContentCleanup().Execute(doc, element);
             }
             else
             {
