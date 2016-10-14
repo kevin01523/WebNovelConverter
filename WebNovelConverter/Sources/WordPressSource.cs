@@ -238,5 +238,19 @@ namespace WebNovelConverter.Sources
                 e.Remove();
             }
         }
+
+        public override async Task<WebNovelInfo> GetNovelInfoAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        {
+            string baseContent = await GetWebPageAsync(baseUrl, token);
+
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
+
+            var title = doc.QuerySelector(".entry-header .entry-title")?.TextContent;
+
+            return new WebNovelInfo
+            {
+                Title = title
+            };
+        }
     }
 }
