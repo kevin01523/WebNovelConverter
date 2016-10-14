@@ -68,8 +68,8 @@ namespace WebNovelConverter.Sources
                 if (e.HasAttribute("Class") && e.GetAttribute("Class").Contains("share-icon") && e.GetAttribute("rel") == "nofollow")
                     continue;
 
-                var hrefUri = new Uri(e.GetAttribute("href"));
-                bool otherDomain = hrefUri.IsAbsoluteUri && hrefUri.Host != new Uri(baseUrl).Host;
+                var hrefUri = new Uri(e.GetAttribute("href"), UriKind.RelativeOrAbsolute);
+                bool otherDomain = hrefUri.IsAbsoluteUri && hrefUri.Host != new Uri(baseUrl, UriKind.Absolute).Host;
                 string url = UrlHelper.ToAbsoluteUrl(baseUrl, e.GetAttribute("href"));
 
                 if (string.IsNullOrEmpty(url))
