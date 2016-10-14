@@ -54,7 +54,7 @@ namespace WebNovelConverter.Sources.Websites
 
             return new WebNovelChapter()
             {
-                Content = new ContentCleanup().Execute(doc, doc.QuerySelector("#storytext"))
+                Content = new ContentCleanup(BaseUrl).Execute(doc, doc.QuerySelector("#storytext"))
             };
         }
 

@@ -5,13 +5,36 @@ namespace WebNovelConverter.Sources.Helpers
 {
     public class ContentCleanup
     {
+        private string _baseUrl;
+
+        public ContentCleanup(string baseUrl)
+        {
+            _baseUrl = baseUrl;
+        }
+
         public string Execute(IDocument doc, IElement element)
         {
             RemoveEmpty(element);
             RemoveMultipleBr(element);
             CreateParagraphs(doc, element);
+            MakeURLsAbsolute(doc, element);
 
             return element.InnerHtml;
+        }
+
+        private void MakeURLsAbsolute(IDocument doc, IElement element)
+        {
+            if (_baseUrl != null)
+            {
+                foreach (IElement el in element.QuerySelectorAll("img"))
+                {
+                    var src = el.Attributes["src"]?.Value;
+                    if(src != null && src.StartsWith("/") )
+                    {
+                        el.SetAttribute("src", UrlHelper.ToAbsoluteUrl(_baseUrl, src));
+                    }
+                }
+            }
         }
 
         /// <summary>

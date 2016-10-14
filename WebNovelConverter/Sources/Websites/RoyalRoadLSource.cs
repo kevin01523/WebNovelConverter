@@ -52,7 +52,7 @@ namespace WebNovelConverter.Sources.Websites
             ExpandSpoilers(postBodyEl);
             RemoveFontStyle(postBodyEl);
 
-            var content = new ContentCleanup().Execute(doc, postBodyEl);
+            var content = new ContentCleanup(BaseUrl).Execute(doc, postBodyEl);
 
             return new WebNovelChapter
             {

@@ -179,7 +179,7 @@ namespace WebNovelConverter.Sources.Websites
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = new ContentCleanup().Execute(doc, contentElement)
+                Content = new ContentCleanup(BaseUrl).Execute(doc, contentElement)
             };
         }
 

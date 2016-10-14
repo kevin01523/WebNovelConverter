@@ -78,7 +78,7 @@ namespace WebNovelConverter.Sources.Websites
 
             IElement titleElement = doc.DocumentElement.FirstWhereHasClass(TitleClasses);
 
-            WebNovelChapter chapter = ParseChapter(doc, doc.DocumentElement, token);
+            WebNovelChapter chapter = ParseChapter(doc, link.Url, doc.DocumentElement, token);
             chapter.Url = link.Url;
 
             if (titleElement != null)
@@ -87,7 +87,7 @@ namespace WebNovelConverter.Sources.Websites
             return chapter;
         }
 
-        private WebNovelChapter ParseChapter(IDocument doc, IElement rootElement, CancellationToken token = default(CancellationToken))
+        private WebNovelChapter ParseChapter(IDocument doc, string baseUrl, IElement rootElement, CancellationToken token = default(CancellationToken))
         {
             WebNovelChapter chapter = new WebNovelChapter();
 
@@ -112,7 +112,7 @@ namespace WebNovelConverter.Sources.Websites
 
             if (element != null)
             {
-                chapter.Content = new ContentCleanup().Execute(doc, element);
+                chapter.Content = new ContentCleanup(baseUrl).Execute(doc, element);
             }
             else
             {

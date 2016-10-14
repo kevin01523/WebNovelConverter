@@ -54,7 +54,7 @@ namespace WebNovelConverter.Sources.Websites
             return new WebNovelChapter
             {
                 ChapterName = titleElement?.TextContent,
-                Content = new ContentCleanup().Execute(doc, contentEl),
+                Content = new ContentCleanup(BaseUrl).Execute(doc, contentEl),
                 NextChapterUrl = nextChapter
             };
         }
