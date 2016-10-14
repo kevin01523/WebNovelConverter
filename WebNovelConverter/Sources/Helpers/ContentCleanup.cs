@@ -14,9 +14,10 @@ namespace WebNovelConverter.Sources.Helpers
 
         public string Execute(IDocument doc, IElement element)
         {
-            RemoveEmpty(element);
+            RemoveEmptyElements(element);
             RemoveMultipleBr(element);
             CreateParagraphs(doc, element);
+            RemoveEmptyTextNodes(element);
             MakeURLsAbsolute(doc, element);
 
             return element.InnerHtml;
@@ -41,16 +42,35 @@ namespace WebNovelConverter.Sources.Helpers
         /// Removes useless empty elements
         /// </summary>
         /// <param name="rootElement"></param>
-        private void RemoveEmpty(IElement rootElement)
+        private void RemoveEmptyElements(IElement rootElement)
         {
             foreach (IElement el in rootElement.QuerySelectorAll("div,span"))
             {
-                RemoveEmpty(el);
+                RemoveEmptyElements(el);
 
                 if (string.IsNullOrWhiteSpace(el.TextContent) && el.ChildElementCount == 0)
                 {
                     el.Remove();
                 }
+            }
+        }
+
+        private void RemoveEmptyTextNodes(IElement element)
+        {
+            int i = 0;
+            while (i < element.ChildNodes.Length)
+            {
+                if (element.ChildNodes[i].NodeType == NodeType.Text && string.IsNullOrWhiteSpace(element.ChildNodes[i].TextContent))
+                {
+                    element.RemoveChild(element.ChildNodes[i]);
+                    continue;
+                }
+
+                // Recursive
+                if (element.ChildNodes[i].NodeType == NodeType.Element && element.ChildNodes[i].HasChildNodes)
+                    RemoveEmptyTextNodes(element.ChildNodes[i] as IElement);
+
+                i++;
             }
         }
 
