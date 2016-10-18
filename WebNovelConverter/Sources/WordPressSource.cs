@@ -245,7 +245,7 @@ namespace WebNovelConverter.Sources
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var title = doc.QuerySelector(".entry-header .entry-title")?.TextContent;
+            var title = (doc.QuerySelector(".entry-header .entry-title") ?? doc.QuerySelector("h1.entry-title"))?.TextContent;
 
             return new WebNovelInfo
             {
