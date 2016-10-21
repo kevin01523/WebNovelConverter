@@ -45,8 +45,6 @@ namespace WebNovelConverter.Sources.Websites
             if (postBodyEl == null)
                 return null;
 
-            RemoveEmptyNodes(postBodyEl);
-            RemoveAnnouncements(postBodyEl);
             RemoveNavigation(postBodyEl);
             RemoveAdvertisements(postBodyEl);
             ExpandSpoilers(postBodyEl);
@@ -77,23 +75,6 @@ namespace WebNovelConverter.Sources.Websites
                 Title = !string.IsNullOrWhiteSpace(title) ? title.Trim() : null,
                 Description = description
             };
-        }
-
-        protected virtual void RemoveEmptyNodes(IElement rootElement)
-        {
-            foreach (var node in rootElement.ChildNodes.ToList())
-            {
-                if (!node.HasChildNodes && string.IsNullOrWhiteSpace(node.TextContent) && node.NodeName.ToLower() != "br")
-                {
-                    rootElement.RemoveChild(node);
-                }
-            }
-        }
-
-        protected virtual void RemoveAnnouncements(IElement rootElement)
-        {
-            if (rootElement.FirstChild != null && rootElement.FirstChild.NodeName.ToLower() == "div")
-                rootElement.RemoveChild(rootElement.FirstChild);
         }
 
         protected virtual void RemoveNavigation(IElement rootElement)
