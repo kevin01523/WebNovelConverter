@@ -16,14 +16,15 @@ namespace WebNovelConverter.Sources.Helpers
         public string Execute(IDocument doc, IElement element)
         {
             RemoveEmptyElements(element);
+            RemoveEmptyTextNodes(element);
             RemoveMultipleBr(element);
+            RemoveBeginEndBr(element);
 
             CreateParagraphs(doc, element);
 
-            RemoveEmptyTextNodes(element);
             MakeURLsAbsolute(doc, element);
 
-            return Regex.Replace(element.InnerHtml, "[ ]{2,}", " ");
+            return Regex.Replace(element.InnerHtml, "[ ]{2,}", " ").Trim();
         }
 
         private void MakeURLsAbsolute(IDocument doc, IElement element)
@@ -58,37 +59,15 @@ namespace WebNovelConverter.Sources.Helpers
             }
         }
 
-        /// <summary>
-        /// Adds a whitespace after each (<w>) element (for LNMTL)
-        /// </summary>
-        /// <param name="rootElement"></param>
-        private void AddWhitespaces(IElement rootElement)
-        {
-            foreach (IElement el in rootElement.QuerySelectorAll("w"))
-            {
-                AddWhitespaces(el);
-
-                el.TextContent = el.TextContent.PadRight(el.TextContent.Length + 1);
-            }
-        }
-
         private void RemoveEmptyTextNodes(IElement element)
         {
-            int i = 0;
-            while (i < element.ChildNodes.Length)
+            element.ForAllNodes(child =>
             {
-                if (element.ChildNodes[i].NodeType == NodeType.Text && string.IsNullOrWhiteSpace(element.ChildNodes[i].TextContent))
+                if (child.NodeType == NodeType.Text && string.IsNullOrWhiteSpace(child.TextContent))
                 {
-                    element.RemoveChild(element.ChildNodes[i]);
-                    continue;
+                    child.Remove();
                 }
-
-                // Recursive
-                if (element.ChildNodes[i].NodeType == NodeType.Element && element.ChildNodes[i].HasChildNodes)
-                    RemoveEmptyTextNodes(element.ChildNodes[i] as IElement);
-
-                i++;
-            }
+            });
         }
 
         /// <summary>
@@ -117,6 +96,30 @@ namespace WebNovelConverter.Sources.Helpers
         }
 
         /// <summary>
+        /// Remove &lt;br&gt; at beginning and end
+        /// </summary>
+        /// <param name="element"></param>
+        private void RemoveBeginEndBr(IElement element)
+        {
+            int i = 0;
+            while (i < element.ChildNodes.Length)
+            {
+                if (element.ChildNodes[i].NodeName == "BR"
+                    && (i == 0 || i == element.ChildNodes.Length-1))
+                {
+                    element.RemoveChild(element.ChildNodes[i]);
+                    continue;
+                }
+
+                // Recursive
+                if (element.ChildNodes[i].NodeType == NodeType.Element && element.ChildNodes[i].HasChildNodes)
+                    RemoveBeginEndBr(element.ChildNodes[i] as IElement);
+
+                i++;
+            }
+        }
+
+        /// <summary>
         /// Converts text separated with multiple &lt;br&gt; into paragraphs with surrounding &lt;p&gt;
         /// </summary>
         /// <param name="doc"></param>
@@ -125,24 +128,45 @@ namespace WebNovelConverter.Sources.Helpers
         {
             foreach (var child in element.ChildNodes.ToList())
             {
-                if (child.NodeType == NodeType.Text && child.NextSibling?.NodeName == "BR" && child.NextSibling?.NextSibling?.NodeName == "BR")
+                if (child.NodeType == NodeType.Text
+                    &&
+                    (
+                        (child.NextSibling?.NodeName == "BR" && child.NextSibling?.NextSibling?.NodeName == "BR")
+                        ||
+                        (child.PreviousSibling?.NodeName == "BR" && child.PreviousSibling?.PreviousSibling?.NodeName == "BR")
+                    )
+                )
                 {
-                    var parent = child.ParentElement;
-
-                    // Remove following <BR>
-                    parent.RemoveChild(child.NextSibling.NextSibling);
-                    parent.RemoveChild(child.NextSibling);
+                    var next = child.NextSibling;
+                    var prev = child.PreviousSibling;
 
                     // Replace text node with <p>
-                    var pEl = ReplaceElementWithParagraph(doc, child);
+                    ReplaceElementWithParagraph(doc, child);
 
-                    // If following element is also text node, ALSO MAKE IT <p>
-                    if (pEl.NextSibling?.NodeType == NodeType.Text)
+                    // Remove following <BR>
+                    while (next?.NodeName == "BR")
                     {
-                        ReplaceElementWithParagraph(doc, pEl.NextSibling);
+                        var curr = next;
+                        next = next.NextSibling;
+                        curr.Remove();
+                    }
+
+                    // Remove preceding <BR>
+                    while (prev?.NodeName == "BR")
+                    {
+                        var curr = prev;
+                        prev = prev.PreviousSibling;
+                        curr.Remove();
+                    }
+
+                    // Last element is text? Then make it also a paragraph
+                    if( next.NodeType == NodeType.Text && next.NextSibling?.NodeName != "BR")
+                    {
+                        ReplaceElementWithParagraph(doc, next);
                     }
                 }
 
+                // Recursive
                 else if (child.NodeType == NodeType.Element)
                     CreateParagraphs(doc, child as IElement);
             }
@@ -154,12 +178,20 @@ namespace WebNovelConverter.Sources.Helpers
         /// <param name="doc"></param>
         /// <param name="element"></param>
         /// <returns></returns>
-        public static IElement ReplaceElementWithParagraph(IDocument doc, INode element)
+        public static void ReplaceElementWithParagraph(IDocument doc, INode element)
         {
-            var newEl = doc.CreateElement("P");
-            newEl.TextContent = element.TextContent.Trim();
-            element.ReplaceWith(newEl);
-            return newEl;
+            var text = element.GetInnerText();
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                element.Remove();
+            }
+            else
+            {
+                var newEl = doc.CreateElement("P");
+                newEl.TextContent = text;
+                element.ReplaceWith(newEl);
+            }
         }
     }
 }

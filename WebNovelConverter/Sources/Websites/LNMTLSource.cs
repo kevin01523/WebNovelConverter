@@ -41,7 +41,7 @@ namespace WebNovelConverter.Sources.Websites
 
             return new WebNovelChapter
             {
-                ChapterName = titleElement?.TextContent?.Trim(),
+                ChapterName = titleElement?.GetInnerText(),
                 Content = new ContentCleanup(BaseUrl).Execute(doc, contentEl),
                 NextChapterUrl = nextChapter
             };
@@ -64,7 +64,7 @@ namespace WebNovelConverter.Sources.Websites
             {
                 if(child.NodeName == "W" || child.NodeName == "T")
                 {
-                    child.ReplaceWith(doc.CreateTextNode(" " + child.TextContent.Trim()));
+                    child.ReplaceWith(doc.CreateTextNode(" " + child.GetInnerText()));
                 }
             });
         }

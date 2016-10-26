@@ -11,6 +11,7 @@ using AngleSharp.Dom;
 using AngleSharp.Parser.Html;
 using WebNovelConverter.Sources.Models;
 using System.IO;
+using WebNovelConverter.Sources.Helpers;
 
 namespace WebNovelConverter.Sources
 {
@@ -78,7 +79,7 @@ namespace WebNovelConverter.Sources
 
                 ChapterLink link = new ChapterLink
                 {
-                    Name = WebUtility.HtmlDecode(e.TextContent).Trim(),
+                    Name = e.GetInnerText(),
                     Url = url,
                     Unknown = otherDomain
                 };

@@ -251,7 +251,7 @@ namespace WebNovelConverter.Sources
                 doc.QuerySelector("h1.entry-title")
                 ??
                 doc.QuerySelector(".entry-header h1.page-title")
-                )?.TextContent;
+                )?.GetInnerText();
 
             return new WebNovelInfo
             {

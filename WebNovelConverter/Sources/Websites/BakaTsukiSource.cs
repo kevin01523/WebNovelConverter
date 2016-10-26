@@ -69,7 +69,7 @@ namespace WebNovelConverter.Sources.Websites
                 if (!possibleChapter.HasAttribute("href"))
                     continue;
 
-                string chTitle = WebUtility.HtmlDecode(possibleChapter.TextContent);
+                string chTitle = possibleChapter.GetInnerText();
                 string chLink = possibleChapter.GetAttribute("href");
                 chLink = UrlHelper.ToAbsoluteUrl(BaseUrl, chLink);
 
@@ -93,7 +93,7 @@ namespace WebNovelConverter.Sources.Websites
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var title = doc.QuerySelector("h1#firstHeading span")?.TextContent;
+            var title = doc.QuerySelector("h1#firstHeading span")?.GetInnerText();
 
             string coverUrl = null;
             var coverUrlEl = doc.QuerySelector("div.thumb a.image img.thumbimage[src*=cover]");

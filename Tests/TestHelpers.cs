@@ -37,14 +37,14 @@ namespace Tests
                         if (!string.IsNullOrEmpty(added))
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("+" + ToAsciiHex(added));
+                            Console.WriteLine("+" + WhiteSpaceToHex(added));
                         }
 
                         string removed = actualValue.Substring(i2, section.LengthInCollection2);
                         if (!string.IsNullOrEmpty(removed))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("-" + ToAsciiHex(removed));
+                            Console.WriteLine("-" + WhiteSpaceToHex(removed));
                         }
 
                         Console.WriteLine();
@@ -58,9 +58,14 @@ namespace Tests
             }
         }
 
-        private static string ToAsciiHex(string input)
+        private static string WhiteSpaceToHex(string input)
         {
-            return string.Join("", input.Select(c => "\\" + ((int)c).ToString("X2") + " "));
+            return string.Join("", input.Select(c => {
+                if (Char.IsWhiteSpace(c))
+                    return "\\x" + ((int)c).ToString("X2");
+                else
+                    return c.ToString();
+            }));
         }
 
         private static string EllipsisString(string input, int maxLength = 100)

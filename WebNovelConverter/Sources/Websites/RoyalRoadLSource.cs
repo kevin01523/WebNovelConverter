@@ -66,8 +66,8 @@ namespace WebNovelConverter.Sources.Websites
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
             var coverUrl = doc.QuerySelector(".fiction-page .fic-header img")?.GetAttribute("src");
-            var title = doc.QuerySelector(".fiction-page .fic-title h2")?.TextContent?.Trim();
-            var description = doc.QuerySelector(".fiction-page .fiction-info .description")?.TextContent?.Trim();
+            var title = doc.QuerySelector(".fiction-page .fic-title h2")?.GetInnerText();
+            var description = doc.QuerySelector(".fiction-page .fiction-info .description")?.GetInnerText();
 
             return new WebNovelInfo
             {
