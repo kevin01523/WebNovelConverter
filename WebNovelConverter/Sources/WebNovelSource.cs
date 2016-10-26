@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Parser.Html;
 using WebNovelConverter.Sources.Models;
+using System.IO;
 
 namespace WebNovelConverter.Sources
 {
@@ -88,6 +89,13 @@ namespace WebNovelConverter.Sources
 
         protected async Task<string> GetWebPageAsync(string url, CancellationToken token = default(CancellationToken))
         {
+            if( url.StartsWith("file://") && AppDomain.CurrentDomain.GetAssemblies()
+                .Any(a => a.FullName.StartsWith("Microsoft.VisualStudio.QualityTools.UnitTestFramework"))
+            )
+            {
+                return File.ReadAllText(new Uri(url).AbsolutePath);
+            }
+
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("WebNovelConverter", "1.0"));

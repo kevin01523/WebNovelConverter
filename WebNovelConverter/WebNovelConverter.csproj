@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Extensions\ElementExtensions.cs" />
     <Compile Include="Sources\Helpers\ContentCleanup.cs" />
+    <Compile Include="Sources\Helpers\IElementHelper.cs" />
     <Compile Include="Sources\Websites\BlogspotSource.cs" />
     <Compile Include="Sources\Websites\FictionPressSource.cs" />
     <Compile Include="Sources\Websites\LNMTLSource.cs" />

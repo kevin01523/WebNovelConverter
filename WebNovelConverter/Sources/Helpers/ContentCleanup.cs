@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Dom;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace WebNovelConverter.Sources.Helpers
 {
@@ -17,20 +18,12 @@ namespace WebNovelConverter.Sources.Helpers
             RemoveEmptyElements(element);
             RemoveMultipleBr(element);
 
-            if (_baseUrl == "http://lnmtl.com")
-            {
-                AddWhitespaces(element);
-                CreateParagraphsLNMTL(doc, element);
-            }
-            else
-            {
-                CreateParagraphs(doc, element);
-            }
+            CreateParagraphs(doc, element);
 
             RemoveEmptyTextNodes(element);
             MakeURLsAbsolute(doc, element);
 
-            return element.InnerHtml;
+            return Regex.Replace(element.InnerHtml, "[ ]{2,}", " ");
         }
 
         private void MakeURLsAbsolute(IDocument doc, IElement element)
@@ -156,38 +149,16 @@ namespace WebNovelConverter.Sources.Helpers
         }
 
         /// <summary>
-        /// Inserts a paragraph after each 'SENTENCE' element (for LNMTL)
-        /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="element"></param>
-        private void CreateParagraphsLNMTL(IDocument doc, IElement element)
-        {
-            foreach (var child in element.ChildNodes.ToList())
-            {
-                if (child.NodeType == NodeType.Element && child.NodeName == "SENTENCE")
-                {
-                    var parent = child.ParentElement;
-
-                    // Add Node to replace it with a paragraph
-                    parent.InsertBefore(child, child);
-
-                    // Replace text node with <p>
-                    var pEl = ReplaceElementWithParagraph(doc, child);
-                }
-            }
-        }
-
-        /// <summary>
         /// Replaces an element with &lt;p&gt; element
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="element"></param>
         /// <returns></returns>
-        private IElement ReplaceElementWithParagraph(IDocument doc, INode element)
+        public static IElement ReplaceElementWithParagraph(IDocument doc, INode element)
         {
             var newEl = doc.CreateElement("P");
             newEl.TextContent = element.TextContent.Trim();
-            element.Parent.ReplaceChild(newEl, element);
+            element.ReplaceWith(newEl);
             return newEl;
         }
     }

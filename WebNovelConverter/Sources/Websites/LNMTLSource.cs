@@ -16,21 +16,6 @@ namespace WebNovelConverter.Sources.Websites
 
         public override List<Mode> AvailableModes => new List<Mode> { Mode.NextChapterLink };
 
-        private static readonly List<string> ChapterTitleClasses = new List<string>
-        {
-            "chapter-title"
-        };
-
-        private static readonly List<string> ChapterClasses = new List<string>
-        {
-            "chapter-body"
-        };
-
-        private static readonly List<string> ChapterContentClasses = new List<string>
-        {
-            "translated"
-        };
-
         public LNMTLSource() : base("LNMTL")
         {
         }
@@ -42,21 +27,46 @@ namespace WebNovelConverter.Sources.Websites
 
             IHtmlDocument doc = await Parser.ParseAsync(content, token);
 
-            IElement titleElement = doc.DocumentElement.FirstWhereHasClass(ChapterTitleClasses);
-            IElement chapterElement = doc.DocumentElement.FirstWhereHasClass(ChapterClasses);
+            IElement titleElement = doc.DocumentElement.QuerySelector(".chapter-title");
+            IElement chapterElement = doc.DocumentElement.QuerySelector(".chapter-body");
 
             var contentEl = doc.CreateElement("P");
-            var chContentElements = chapterElement.WhereHasClass(ChapterContentClasses, element => element.LocalName == "sentence");
-            contentEl.Append(chContentElements.Cast<INode>().ToArray());
+            contentEl.InnerHtml = string.Join("", chapterElement
+                .QuerySelectorAll("sentence.translated")
+                .Select(x => x.InnerHtml));
+            CreateParagraphs(doc, contentEl);
+            RemoveSpecialTags(doc, contentEl);
 
             string nextChapter = doc.QuerySelector("ul.pager > li.next > a")?.GetAttribute("href");
 
             return new WebNovelChapter
             {
-                ChapterName = titleElement?.TextContent,
+                ChapterName = titleElement?.TextContent?.Trim(),
                 Content = new ContentCleanup(BaseUrl).Execute(doc, contentEl),
                 NextChapterUrl = nextChapter
             };
+        }
+
+        private void CreateParagraphs(IDocument doc, IElement element)
+        {
+            foreach (var child in element.ChildNodes.ToList())
+            {
+                if (child.NodeType == NodeType.Element && child.NodeName == "DQ")
+                {
+                    ContentCleanup.ReplaceElementWithParagraph(doc, child);
+                }
+            }
+        }
+
+        private void RemoveSpecialTags(IDocument doc, IElement element)
+        {
+            element.ForAllElements(child =>
+            {
+                if(child.NodeName == "W" || child.NodeName == "T")
+                {
+                    child.ReplaceWith(doc.CreateTextNode(" " + child.TextContent.Trim()));
+                }
+            });
         }
     }
 }

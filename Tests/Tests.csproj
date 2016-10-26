@@ -39,6 +39,10 @@
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.4\lib\net45\AngleSharp.dll</HintPath>
     </Reference>
+    <Reference Include="DiffLib, Version=2016.4.21.1027, Culture=neutral, PublicKeyToken=9e2fabf3af85dba9, processorArchitecture=MSIL">
+      <HintPath>..\packages\DiffLib.2016.4.21.1027\lib\net40\DiffLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -55,13 +59,23 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ContentCleanupTest.cs" />
+    <Compile Include="LNMTLTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebNovelConverter\WebNovelConverter.csproj">
       <Project>{6330c254-7ee2-4e22-aa9d-576acaf89b41}</Project>
       <Name>WebNovelConverter</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\LNMTLPage1.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
