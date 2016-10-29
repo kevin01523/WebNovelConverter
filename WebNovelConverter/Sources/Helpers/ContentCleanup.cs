@@ -160,7 +160,7 @@ namespace WebNovelConverter.Sources.Helpers
                     }
 
                     // Last element is text? Then make it also a paragraph
-                    if( next.NodeType == NodeType.Text && next.NextSibling?.NodeName != "BR")
+                    if( next?.NodeType == NodeType.Text && next.NextSibling?.NodeName != "BR")
                     {
                         ReplaceElementWithParagraph(doc, next);
                     }
