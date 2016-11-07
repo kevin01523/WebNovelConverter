@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
-using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
 using WebNovelConverter.Sources.Helpers;
 
@@ -30,11 +29,15 @@ namespace WebNovelConverter.Sources.Websites
             IElement titleElement = doc.DocumentElement.QuerySelector(".chapter-title");
             IElement chapterElement = doc.DocumentElement.QuerySelector(".chapter-body");
 
+            // Append paragraphs after each "sentence.translated" element.
+            chapterElement
+                .QuerySelectorAll("sentence.translated")
+                .ToList()
+                .ForEach((obj) => obj.AppendChild(doc.CreateElement("P")));
             var contentEl = doc.CreateElement("P");
             contentEl.InnerHtml = string.Join("", chapterElement
                 .QuerySelectorAll("sentence.translated")
                 .Select(x => x.InnerHtml));
-            CreateParagraphs(doc, contentEl);
             RemoveSpecialTags(doc, contentEl);
 
             string nextChapter = doc.QuerySelector("ul.pager > li.next > a")?.GetAttribute("href");
@@ -47,22 +50,17 @@ namespace WebNovelConverter.Sources.Websites
             };
         }
 
-        private void CreateParagraphs(IDocument doc, IElement element)
-        {
-            foreach (var child in element.ChildNodes.ToList())
-            {
-                if (child.NodeType == NodeType.Element && child.NodeName == "DQ")
-                {
-                    ContentCleanup.ReplaceElementWithParagraph(doc, child);
-                }
-            }
-        }
-
         private void RemoveSpecialTags(IDocument doc, IElement element)
         {
             element.ForAllElements(child =>
             {
-                if(child.NodeName == "W" || child.NodeName == "T")
+                if(child.NodeName == "DQ")
+                {
+                    var newEl = doc.CreateElement("DQ");
+                    newEl.TextContent = child.GetInnerText();
+                    child.ReplaceWith(newEl);
+                }
+                else if(child.NodeName == "W" || child.NodeName == "T")
                 {
                     child.ReplaceWith(doc.CreateTextNode(" " + child.GetInnerText()));
                 }
