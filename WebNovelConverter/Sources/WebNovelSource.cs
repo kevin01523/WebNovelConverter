@@ -12,6 +12,7 @@ using AngleSharp.Parser.Html;
 using WebNovelConverter.Sources.Models;
 using System.IO;
 using WebNovelConverter.Sources.Helpers;
+using System.Reflection;
 
 namespace WebNovelConverter.Sources
 {
@@ -90,11 +91,13 @@ namespace WebNovelConverter.Sources
 
         protected async Task<string> GetWebPageAsync(string url, CancellationToken token = default(CancellationToken))
         {
-            if( url.StartsWith("file://") && AppDomain.CurrentDomain.GetAssemblies()
-                .Any(a => a.FullName.StartsWith("Microsoft.VisualStudio.QualityTools.UnitTestFramework"))
-            )
+            if(url.StartsWith("file://"))
             {
-                return File.ReadAllText(new Uri(url).AbsolutePath);
+                var path = Path.GetFullPath(Uri.UnescapeDataString(new Uri(url).AbsolutePath));
+                if (path.StartsWith(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
+                    return File.ReadAllText(path);
+                else
+                    throw new Exception("Path not allowed");
             }
 
             using (HttpClient client = new HttpClient())

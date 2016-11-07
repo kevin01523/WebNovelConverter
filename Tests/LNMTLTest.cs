@@ -1,19 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System;
 using System.IO;
+using System.Reflection;
 using WebNovelConverter.Sources.Models;
 using WebNovelConverter.Sources.Websites;
 
 namespace Tests
 {
-    [TestClass]
+    [TestFixture]
     public class LNMTLTest
     {
-        [TestMethod]
+        [Test]
         public void LNMTLPageTest1()
         {
             var source = new LNMTLSource();
-            var uri = new Uri(Path.Combine(Environment.CurrentDirectory, "Resources/LNMTLPage1.html")).AbsoluteUri;
+            var uri = new Uri(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources/LNMTLPage1.html")).AbsoluteUri;
             var data = source.GetChapterAsync(new ChapterLink()
             {
                 Url = uri,

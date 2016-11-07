@@ -1,19 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System;
 using System.IO;
+using System.Reflection;
 using WebNovelConverter.Sources.Models;
 using WebNovelConverter.Sources.Websites;
 
 namespace Tests
 {
-    [TestClass]
+    [TestFixture]
     public class RoyalRoadlTest
     {
-        [TestMethod]
+        [Test]
         public void RoyalRoadlIndexTest1()
         {
             var source = new RoyalRoadLSource();
-            var uri = new Uri(Path.Combine(Environment.CurrentDirectory, "Resources/RoyalRoadlIndex1.html")).AbsoluteUri;
+            var uri = new Uri(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources/RoyalRoadlIndex1.html")).AbsoluteUri;
             var data = source.GetNovelInfoAsync(uri).Result;
 
             Assert.AreEqual("The Iron Teeth: A Goblin's Tale", data.Title);
@@ -24,11 +25,11 @@ namespace Tests
  Don't forget to vote every week at TopWebFiction, thanks.");
         }
 
-        [TestMethod]
+        [Test]
         public void RoyalRoadlPageTest1()
         {
             var source = new RoyalRoadLSource();
-            var uri = new Uri(Path.Combine(Environment.CurrentDirectory, "Resources/RoyalRoadlPage1.html")).AbsoluteUri;
+            var uri = new Uri(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources/RoyalRoadlPage1.html")).AbsoluteUri;
             var data = source.GetChapterAsync(new ChapterLink()
             {
                 Url = uri,
