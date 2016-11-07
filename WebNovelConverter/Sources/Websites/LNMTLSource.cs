@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
-using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
 using WebNovelConverter.Sources.Helpers;
 
