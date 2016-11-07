@@ -55,7 +55,13 @@ namespace WebNovelConverter.Sources.Websites
         {
             element.ForAllElements(child =>
             {
-                if(child.NodeName == "W" || child.NodeName == "T")
+                if(child.NodeName == "DQ")
+                {
+                    var newEl = doc.CreateElement("DQ");
+                    newEl.TextContent = child.GetInnerText();
+                    child.ReplaceWith(newEl);
+                }
+                else if(child.NodeName == "W" || child.NodeName == "T")
                 {
                     child.ReplaceWith(doc.CreateTextNode(" " + child.GetInnerText()));
                 }
