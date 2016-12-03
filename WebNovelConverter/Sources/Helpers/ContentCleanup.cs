@@ -15,6 +15,7 @@ namespace WebNovelConverter.Sources.Helpers
 
         public string Execute(IDocument doc, IElement element)
         {
+            RemoveUnneededElements(element);
             RemoveEmptyElements(element);
             RemoveEmptyTextNodes(element);
             RemoveMultipleBr(element);
@@ -31,7 +32,7 @@ namespace WebNovelConverter.Sources.Helpers
         {
             if (_baseUrl != null)
             {
-                foreach (IElement el in element.QuerySelectorAll("img"))
+                foreach (IElement el in element.QuerySelectorAll("img").ToList())
                 {
                     var src = el.Attributes["src"]?.Value;
                     if (src != null && src.StartsWith("/"))
@@ -42,21 +43,35 @@ namespace WebNovelConverter.Sources.Helpers
             }
         }
 
+        private void RemoveUnneededElements(IElement rootElement)
+        {
+            foreach (IElement el in rootElement.QuerySelectorAll("script,style,iframe").ToList())
+            {
+                el.Remove();
+            }
+        }
+
         /// <summary>
         /// Removes useless empty elements
         /// </summary>
         /// <param name="rootElement"></param>
         private void RemoveEmptyElements(IElement rootElement)
         {
-            foreach (IElement el in rootElement.QuerySelectorAll("div,span"))
+            bool removed;
+            do
             {
-                RemoveEmptyElements(el);
+                removed = false;
 
-                if (string.IsNullOrWhiteSpace(el.TextContent) && el.ChildElementCount == 0)
+                foreach (IElement el in rootElement.QuerySelectorAll("div,span").ToList())
                 {
-                    el.Remove();
+                    if (el.ChildElementCount == 0 && string.IsNullOrWhiteSpace(el.TextContent))
+                    {
+                        removed = true;
+                        el.Remove();
+                    }
                 }
             }
+            while (removed);
         }
 
         private void RemoveEmptyTextNodes(IElement element)
