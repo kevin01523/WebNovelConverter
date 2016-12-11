@@ -176,10 +176,11 @@ namespace WebNovelConverter.Sources
 
             if (element != null)
             {
+                chapter.ChapterName = chapterNameElement?.Text()?.Trim();
+
                 RemoveNavigation(element);
                 RemoveScriptStyleElements(element);
-
-                chapter.ChapterName = chapterNameElement?.Text()?.Trim();
+                RemoveTitles(element);
                 chapter.Content = new ContentCleanup(baseUrl).Execute(doc, element);
             }
             else
@@ -188,6 +189,18 @@ namespace WebNovelConverter.Sources
             }
 
             return chapter;
+        }
+
+        /// <summary>
+        /// Titles are often inside the chapter-content part
+        /// </summary>
+        /// <param name="element"></param>
+        private void RemoveTitles(IElement element)
+        {
+            var titleEl = element.QuerySelectorAll("h1,h2,h3,h4,h5")
+                .Where(x => TitleClasses.Any(t => x.ClassName.Contains(t)))
+                .FirstOrDefault();
+            titleEl?.Remove();
         }
 
         protected virtual IEnumerable<string> GetPagedChapterUrls(IElement rootElement)
