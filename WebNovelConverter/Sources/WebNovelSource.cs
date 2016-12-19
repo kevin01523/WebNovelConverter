@@ -104,7 +104,7 @@ namespace WebNovelConverter.Sources
                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("WebNovelConverter", "1.0"));
                 
                 var resp = await client.GetAsync(url, token);
-                //resp.EnsureSuccessStatusCode();
+                resp.EnsureSuccessStatusCode();
 
                 byte[] content = await resp.Content.ReadAsByteArrayAsync();
 
