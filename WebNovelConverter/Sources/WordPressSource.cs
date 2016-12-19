@@ -148,7 +148,7 @@ namespace WebNovelConverter.Sources
                                         || e.LocalName == "h3" || e.LocalName == "h4"
                                       select e).FirstOrDefault();
             }
-            else
+            else if(chapterNameElement != null)
             {
                 IElement chNameLinkElement = (from e in chapterNameElement.Descendents<IElement>()
                                               where e.LocalName == "a"
@@ -158,15 +158,31 @@ namespace WebNovelConverter.Sources
                     chapterNameElement = chNameLinkElement;
             }
 
-            IElement nextChapterElement = (from e in articleElement?.Descendents<IElement>() ?? rootElement.Descendents<IElement>()
-                                           where e.LocalName == "a"
-                                           let text = e.Text()
-                                           let a = NextChapterNames.FirstOrDefault(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
-                                           where a != null || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
-                                           let index = NextChapterNames.IndexOf(a)
-                                           let o = index >= 0 ? index : int.MaxValue
-                                           orderby o
-                                           select e).FirstOrDefault();
+            IElement nextChapterElement = null;
+            if (articleElement != null)
+            {
+                nextChapterElement = (from e in articleElement.Descendents<IElement>()
+                                      where e.LocalName == "a"
+                                      let text = e.Text()
+                                      let a = NextChapterNames.FirstOrDefault(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                                      where a != null || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
+                                      let index = NextChapterNames.IndexOf(a)
+                                      let o = index >= 0 ? index : int.MaxValue
+                                      orderby o
+                                      select e).FirstOrDefault();
+            }
+            if (nextChapterElement == null)
+            {
+                nextChapterElement = (from e in rootElement.Descendents<IElement>()
+                                      where e.LocalName == "a"
+                                      let text = e.Text()
+                                      let a = NextChapterNames.FirstOrDefault(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                                      where a != null || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
+                                      let index = NextChapterNames.IndexOf(a)
+                                      let o = index >= 0 ? index : int.MaxValue
+                                      orderby o
+                                      select e).FirstOrDefault();
+            }
 
             WebNovelChapter chapter = new WebNovelChapter();
             if (nextChapterElement != null)
@@ -198,7 +214,7 @@ namespace WebNovelConverter.Sources
         private void RemoveTitles(IElement element)
         {
             var titleEl = element.QuerySelectorAll("h1,h2,h3,h4,h5")
-                .Where(x => TitleClasses.Any(t => x.ClassName.Contains(t)))
+                .Where(x => TitleClasses.Any(t => x.ClassName != null && x.ClassName.Contains(t)))
                 .FirstOrDefault();
             titleEl?.Remove();
         }
