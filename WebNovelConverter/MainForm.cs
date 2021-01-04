@@ -194,11 +194,6 @@ namespace WebNovelConverter
                         else
                         {
                             book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
-
-#if DEBUG
-                            File.AppendAllText(@"C:\temp\webnovelconverter.txt", chapter.Content);
-#endif
-
                             WriteText($"{link.Name} has been processed.", Color.Green);
                         }
                     }
