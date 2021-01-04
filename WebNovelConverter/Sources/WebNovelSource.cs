@@ -68,7 +68,7 @@ namespace WebNovelConverter.Sources
                     continue;
 
                 // Skip social media share links
-                if (e.HasAttribute("Class") && e.GetAttribute("Class").Contains("share-icon") && e.GetAttribute("rel") == "nofollow")
+                if (e.HasAttribute("class") && e.GetAttribute("class").Contains("share-icon"))
                     continue;
 
                 bool otherDomain = UrlHelper.IsOtherDomain(e.GetAttribute("href"), baseUrl);
