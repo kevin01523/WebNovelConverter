@@ -51,7 +51,7 @@ jobs:
       - name: Build Artifact
         shell: cmd
         id: artifacts
-        run: powershell Compress-7Zip "bin\Release" -ArchiveFileName "WebNovelConverter.zip" -Format Zip ; Get-ChildItem -Force
+        run: powershell Compress-7Zip "WebNovelConverter\bin\Release" -ArchiveFileName "WebNovelConverter.zip" -Format Zip ; Get-ChildItem -Force
 
       - name: Prepare release tag
         shell: bash
