@@ -1,32 +1,39 @@
-name: CI
+name: Build
 on:
-workflow_dispatch:
-push:
-branches: [ main ]
-pull_request:
-branches: [ main ]
+  #schedule:
+  #  - cron: "30 2 1 * *"
+  push:
+    branches: [master]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [build]
 
+concurrency: 
+  group: ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-build:
+  build:
+    name: Build WSA
+    runs-on: windows-2019
+    
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
 
-runs-on: windows-2019
-
-steps:
-- uses: actions/checkout@v2
-
-- name: Setup MSBuild
-  uses: microsoft/setup-msbuild@v1
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
 
 #- name: Setup NuGet
 #  uses: NuGet/setup-nuget@v1.0.5
   
-- name: setup-msbuild
-  uses: microsoft/setup-msbuild@v1.1
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.1
 
 #- name: Restore Packages
 #  run: nuget restore MySolution.sln
 
-- name: Build solution
-  run: msbuild WebNovelConverter.sln -t:rebuild -property:Configuration=Release
+      - name: Build solution
+        run: msbuild WebNovelConverter.sln -t:rebuild -property:Configuration=Release
