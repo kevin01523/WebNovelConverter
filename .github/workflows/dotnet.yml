@@ -36,8 +36,40 @@ jobs:
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.1
 
+      - name: Build solution
+        run: msbuild WebNovelConverter.sln -t:rebuild -property:Configuration=Release
+              
+      - name: Build Artifact
+        shell: cmd
+        id: artifacts
+        run: powershell Compress-7Zip "bin\Release" -ArchiveFileName "WebNovelConverter.zip" -Format Zip
+
+      - name: Prepare release tag
+        shell: bash
+        id: date
+        run: echo "date=$(date +'v%Y-%m-%d')" >> $GITHUB_OUTPUT
+        
+      - name: add timestamp
+        shell: bash
+        id: date2
+        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT
+      
+      - name: rename files
+        shell: bash
+        id: rename
+        run: cp "./WebNovelConverter.zip  "./${{ steps.date2.outputs.date2 }}.MCLauncher.zip"
+
+      - name: Upload build to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: \${{ steps.date2.outputs.date2 }}.WebNovelConverter.zip
+          tag: ${{ steps.date.outputs.date }}
+          overwrite: true
+          file_glob: true
+          shell: bash
+
 #- name: Restore Packages
 #  run: nuget restore MySolution.sln
 
-      - name: Build solution
-        run: msbuild WebNovelConverter.sln -t:rebuild -property:Configuration=Release
+
