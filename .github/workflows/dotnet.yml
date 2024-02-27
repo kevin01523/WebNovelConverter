@@ -45,12 +45,13 @@ jobs:
 
       - name: Build WebNovelConverte proj
         id: WebNovelConverter
-        run: msbuild WebNovelConverter.sln  /t:"Clean;Build" /p:Configuration=Release /p:Platform="x64"
+        run: msbuild WebNovelConverter.sln  -t:rebuild -property:Configuration=Release
+
               
       - name: Build Artifact
         shell: cmd
         id: artifacts
-        run: powershell Compress-7Zip "x64\Release" -ArchiveFileName "WebNovelConverter.zip" -Format Zip
+        run: powershell Compress-7Zip "\Release" -ArchiveFileName "WebNovelConverter.zip" -Format Zip
 
       - name: Prepare release tag
         shell: bash
