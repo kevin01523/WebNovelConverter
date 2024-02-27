@@ -45,7 +45,7 @@ jobs:
 
       - name: Build WebNovelConverte proj
         id: WebNovelConverter
-        run: msbuild WebNovelConverter.sln  /t:"Clean;Build" /p:Configuration=Release /p:Platform=x64
+        run: msbuild WebNovelConverter.sln  /t:"Clean;Build" /p:Configuration=Release /p:Platform="x64"
               
       - name: Build Artifact
         shell: cmd
