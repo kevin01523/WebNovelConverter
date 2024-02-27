@@ -40,10 +40,11 @@ jobs:
         run: nuget restore WebNovelConverter.sln
 
   
-      - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1.1
+    #  - name: setup-msbuild
+    #    uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build solution
+      - name: Build WebNovelConverte proj
+        id: WebNovelConverter
         run: msbuild WebNovelConverter.sln  /t:"Clean;Build" /p:Configuration=Release /p:Platform=x64
               
       - name: Build Artifact
