@@ -61,7 +61,7 @@ jobs:
       - name: rename files
         shell: bash
         id: rename
-        run: cp "./WebNovelConverter.zip  "./${{ steps.date2.outputs.date2 }}.MCLauncher.zip"
+        run: cp "./WebNovelConverter.zip  "./${{ steps.date2.outputs.date2 }}.WebNovelConverter.zip"
 
       - name: Upload build to release
         uses: svenstaro/upload-release-action@v2
